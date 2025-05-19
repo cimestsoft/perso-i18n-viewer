@@ -48,25 +48,37 @@ export class I18nDecorationProvider {
 
     // t() 형식의 문자열 체크 regex
     // const regex = /t\(\s*['"`]([^'"`]+)['"`]\s*\)/g;
+
     // 모든 '...', "..." 형식의 문자열 체크
     const regex = /'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"/g;
     const decos: vscode.DecorationOptions[] = [];
 
     const text = editor.document.getText();
     for (const match of text.matchAll(regex)) {
-      const key = match[0].slice(1, -1);
-      const localized = this.i18n.t(this.currentLanguage, key);
-      if (!localized) continue;
+      try {
+        // Escape sequence(\n, \t 등) 처리를 위해 plain text를 JSON.parse로 변환
+        const key = JSON.parse('"' + match[0].slice(1, -1) + '"') as string;
+        const localized = this.i18n.t(this.currentLanguage, key);
+        if (!localized) continue;
 
-      const startPos = editor.document.positionAt(match.index!);
-      const endPos = editor.document.positionAt(match.index! + match[0].length);
+        const startPos = editor.document.positionAt(match.index!);
+        const endPos = editor.document.positionAt(
+          match.index! + match[0].length
+        );
 
-      decos.push({
-        range: new vscode.Range(startPos, endPos),
-        renderOptions: {
-          after: { contentText: `➡ ${localized}` },
-        },
-      });
+        decos.push({
+          range: new vscode.Range(startPos, endPos),
+          renderOptions: {
+            after: {
+              // Escape sequence를 plain text로 변환
+              contentText: `➡ ${JSON.stringify(localized).slice(1, -1)}`,
+            },
+          },
+        });
+      } catch (e) {
+        // JSON.parse 에러 무시
+        console.error("Error parsing JSON:", e);
+      }
     }
 
     editor.setDecorations(this.decorationType, decos);
