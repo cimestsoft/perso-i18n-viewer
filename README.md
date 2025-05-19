@@ -1,6 +1,6 @@
 # 사용 방법
 
-기능은 기본적으로 비활성화되어 있으며, 커맨드 팔레트(Cmd+Shift+P)를 통해 활성화 가능
+기능은 기본적으로 비활성화되어 있으며, 커맨드 팔레트(Cmd+Shift+P)를 통해 사용 가능
 
 사용 가능한 명령어는 총 3가지
 
@@ -15,11 +15,13 @@
 ```json
 {
   "localesPath": "apps/portal/messages",
-  "defaultLanguage": "ko"
+  "defaultLanguage": "en"
 }
 ```
 
 - localesPath는 다국어 번역 파일이 위치한 경로
 - defaultLanguage는 기본적으로 선택할 언어
 
-위의 json 파일이 기본적으로 extension 내에 세팅되어 있으므로 defaultLanguage를 변경할 게 아니면 굳이 할 필요는 없습니다.
+위의 json 파일이 기본적으로 extension 내에 세팅되어 있으니, 기본값을 사용하신다면 굳이 파일을 추가할 필요는 없습니다.
+
+기본적으로 표시될 언어를 한국어로 변경하고 싶다면 파일을 추가해서 defaultLanguage를 "ko"로 변경하세요!
