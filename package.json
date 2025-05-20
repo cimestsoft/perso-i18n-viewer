@@ -43,6 +43,7 @@
       "persoi18nviewer-sidebar": [
         {
           "id": "persoi18nviewer-actions",
+          "icon": "resources/global.png",
           "name": "페르소 i18n 뷰어"
         }
       ]
