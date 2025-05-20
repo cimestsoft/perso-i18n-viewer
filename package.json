@@ -29,7 +29,24 @@
         "command": "persoi18nviewer.reload",
         "title": "다국어(i18n): 번역 새로고침"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "persoi18nviewer-sidebar",
+          "title": "페르소 i18n 뷰어",
+          "icon": "resources/global.png"
+        }
+      ]
+    },
+    "views": {
+      "persoi18nviewer-sidebar": [
+        {
+          "id": "persoi18nviewer-actions",
+          "name": "페르소 i18n 뷰어"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

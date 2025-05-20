@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { loadConfig } from "./config";
 import { I18nManager } from "./i18nManager";
 import { I18nDecorationProvider } from "./decorationProvider";
+import { I18nSidebarProvider } from "./sidebarProvider";
 
 export async function activate(context: vscode.ExtensionContext) {
   const workspace = vscode.workspace.workspaceFolders?.[0];
@@ -14,10 +15,18 @@ export async function activate(context: vscode.ExtensionContext) {
     config.defaultLanguage
   );
 
+  // 사이드바 뷰 등록
+  const sidebarProvider = new I18nSidebarProvider(decorator);
+  vscode.window.registerTreeDataProvider(
+    "persoi18nviewer-actions",
+    sidebarProvider
+  );
+
   /* 명령 등록 */
   context.subscriptions.push(
     vscode.commands.registerCommand("persoi18nviewer.togglePreview", () => {
       decorator.toggle();
+      sidebarProvider.refresh(); // 토글 시 사이드바 갱신
     }),
     vscode.commands.registerCommand(
       "persoi18nviewer.selectLanguage",

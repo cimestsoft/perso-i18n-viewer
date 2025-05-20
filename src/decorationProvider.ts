@@ -88,6 +88,10 @@ export class I18nDecorationProvider {
     this.decorationType.dispose();
   }
 
+  getEnabled() {
+    return this.enabled;
+  }
+
   private isValidDocument(doc: vscode.TextDocument) {
     return [
       "javascript",
