@@ -2,7 +2,7 @@
   "name": "persoi18nviewer",
   "displayName": "페르소 다국어 도우미",
   "description": "코드에서 번역 키에 해당하는 문자열을 찾아 실제 번역된 문장을 표시",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "cimestsoft",
   "engines": {
     "vscode": "^1.95.0"
