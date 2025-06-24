@@ -4,12 +4,14 @@ import * as fs from "fs";
 
 export interface PersoI18nViewerConfig {
   localesPath: string; // 상대 또는 절대 경로
-  defaultLanguage: string; // "en" 등
+  locales: string[]; // ["en", "ko", ...] (선택적)
+  defaultLocale: string; // "en" 등
 }
 
 const DEFAULT_CONFIG: PersoI18nViewerConfig = {
-  localesPath: "apps/portal/messages",
-  defaultLanguage: "en",
+  localesPath: "apps/portal/messages/${locale}.json",
+  locales: ["en", "ko"],
+  defaultLocale: "en",
 };
 
 export function loadConfig(

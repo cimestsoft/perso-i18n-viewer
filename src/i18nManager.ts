@@ -39,23 +39,27 @@ export class I18nManager {
   // --- private -----------------------------------------------------------
 
   private loadAll() {
-    const absLocalesDir = path.isAbsolute(this.config.localesPath)
-      ? this.config.localesPath
-      : path.join(this.workspace.uri.fsPath, this.config.localesPath);
+    this.config.locales.forEach((locale) => {
+      const filePath = this.config.localesPath.replace("${locale}", locale);
+      console.log(filePath);
 
-    if (!fs.existsSync(absLocalesDir)) return;
+      const absFilePath = path.isAbsolute(filePath)
+        ? filePath
+        : path.join(this.workspace.uri.fsPath, filePath);
 
-    fs.readdirSync(absLocalesDir)
-      .filter((f) => f.endsWith(".json"))
-      .forEach((file) => {
-        const lang = path.parse(file).name; // "en" from "en.json"
-        try {
-          const raw = fs.readFileSync(path.join(absLocalesDir, file), "utf-8");
-          this.translations.set(lang, JSON.parse(raw));
-        } catch {
-          /* ignore malformed */
-        }
-      });
+      if (!fs.existsSync(absFilePath)) {
+        console.warn(`Locale file not found: ${absFilePath}`);
+        return;
+      }
+
+      try {
+        const raw = fs.readFileSync(absFilePath, "utf-8");
+        this.translations.set(locale, JSON.parse(raw));
+      } catch (error) {
+        // Ignore malformed JSON files
+        console.error(`Error reading locale file ${absFilePath}:`, error);
+      }
+    });
   }
 
   private createWatcher() {

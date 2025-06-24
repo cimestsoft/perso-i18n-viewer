@@ -12,7 +12,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const i18nManager = new I18nManager(workspace, config, refresh);
   const decorator = new I18nDecorationProvider(
     i18nManager,
-    config.defaultLanguage
+    config.defaultLocale
   );
 
   // 사이드바 뷰 등록
