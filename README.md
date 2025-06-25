@@ -27,3 +27,13 @@
 위의 json 파일이 기본적으로 extension 내에 세팅되어 있으니, 기본값을 사용하신다면 굳이 파일을 추가할 필요는 없습니다.
 
 기본적으로 표시될 언어를 한국어로 변경하고 싶다면 파일을 추가해서 defaultLocale를 "ko"로 변경하세요!
+
+## 스튜디오 설정 파일 예시
+
+```json
+{
+  "localesPath": "src/locales/${locale}/translation.json",
+  "locales": ["en", "ko"],
+  "defaultLocale": "ko"
+}
+```
