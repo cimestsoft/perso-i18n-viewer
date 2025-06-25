@@ -37,3 +37,15 @@
   "defaultLocale": "ko"
 }
 ```
+
+# 프로젝트 vsix 파일로 빌드하기
+
+```
+vsce package
+```
+
+## vsce 미설치 시
+
+```
+npm install -g @vscode/vsce
+```
