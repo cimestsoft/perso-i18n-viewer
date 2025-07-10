@@ -41,7 +41,6 @@ export class I18nManager {
   private loadAll() {
     this.config.locales.forEach((locale) => {
       const filePath = this.config.localesPath.replace("${locale}", locale);
-      console.log(filePath);
 
       const absFilePath = path.isAbsolute(filePath)
         ? filePath
@@ -63,12 +62,14 @@ export class I18nManager {
   }
 
   private createWatcher() {
-    const absLocalesDir = path.isAbsolute(this.config.localesPath)
-      ? this.config.localesPath
-      : path.join(this.workspace.uri.fsPath, this.config.localesPath);
+    // localesPath에서 디렉터리 경로 추출 (${locale} 부분을 제거)
+    const templatePath = this.config.localesPath.replace("${locale}", "*");
+    const workspacePath = this.workspace.uri.fsPath;
+
+    // 디렉터리 경로와 파일명 패턴 분리
 
     this.watcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(absLocalesDir, "*.json")
+      new vscode.RelativePattern(workspacePath, templatePath)
     );
 
     const reload = () => this.reload();
