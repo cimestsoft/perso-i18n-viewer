@@ -28,6 +28,10 @@
       {
         "command": "persoi18nviewer.reload",
         "title": "다국어(i18n): 번역 새로고침"
+      },
+      {
+        "command": "persoi18nviewer.fetchTranslations",
+        "title": "다국어(i18n): 번역 가져오기"
       }
     ],
     "viewsContainers": {

@@ -36,6 +36,11 @@ export class I18nSidebarProvider
           "persoi18nviewer.reload",
           "refresh"
         ),
+        new I18nSidebarItem(
+          "번역 가져오기",
+          "persoi18nviewer.fetchTranslations",
+          "cloud-download"
+        ),
       ]);
     }
     return Promise.resolve([]);
