@@ -16,14 +16,17 @@ export async function activate(context: vscode.ExtensionContext) {
     return; // package.json이 없으면 extension 비활성화
   }
 
+  let projectName: "portal" | "studio";
+
   try {
     const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
     const packageJson = JSON.parse(packageJsonContent);
 
-    if (
-      packageJson.name !== "perso-mono-front" &&
-      packageJson.name !== "perso-frontend"
-    ) {
+    if (packageJson.name === "perso-mono-front") {
+      projectName = "portal";
+    } else if (packageJson.name === "perso-frontend") {
+      projectName = "studio";
+    } else {
       return; // name이 "perso-mono-front" 또는 "perso-frontend"가 아니면 extension 비활성화
     }
   } catch (error) {
@@ -31,7 +34,7 @@ export async function activate(context: vscode.ExtensionContext) {
     return; // package.json 읽기 실패 시 extension 비활성화
   }
 
-  let config = loadConfig(workspace);
+  let config = loadConfig(projectName);
   const i18nManager = new I18nManager(workspace, config, refresh);
   const decorator = new I18nDecorationProvider(
     i18nManager,
@@ -46,7 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
   const reloadConfig = () => {
-    config = loadConfig(workspace);
+    config = loadConfig(projectName);
     i18nManager.reload(config);
   };
   configWatcher.onDidChange(reloadConfig);
@@ -80,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     ),
     vscode.commands.registerCommand("persoi18nviewer.reload", () => {
-      config = loadConfig(workspace); // config 재로드 (폴더 경로 변경 가능)
+      config = loadConfig(projectName); // config 재로드 (폴더 경로 변경 가능)
       i18nManager.reload(config);
     })
   );
