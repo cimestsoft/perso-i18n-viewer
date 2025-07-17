@@ -8,35 +8,10 @@
 2. 다국어(i18n): 언어 선택
 3. 다국어(i18n): 번역 새로고침
 
-# Extension 설정(선택)
+# Extension 설정(삭제됨)
 
-.vscode/persoi18nviewer.json 파일을 생성해서 아래의 형식으로 파일 작성
-
-```json
-{
-  "localesPath": "apps/portal/messages/${locale}.json",
-  "locales": ["en", "ko"],
-  "defaultLocale": "en"
-}
-```
-
-## 스튜디오 설정 파일 예시
-
-```json
-{
-  "localesPath": "src/locales/${locale}/translation.json",
-  "locales": ["en", "ko"],
-  "defaultLocale": "ko"
-}
-```
-
-- localesPath는 다국어 번역 파일이 위치한 경로, ${locale} 부분을 locales의 원소들로 하나씩 치환하면서 불러옴
-- locales는 언어 목록
-- defaultLocale는 기본적으로 선택할 언어
-
-위의 json 파일이 기본적으로 extension 내에 세팅되어 있으니, 기본값을 사용하신다면 굳이 파일을 추가할 필요는 없습니다.
-
-기본적으로 표시될 언어를 한국어로 변경하고 싶다면 파일을 추가해서 defaultLocale를 "ko"로 변경하세요!
+기존에 사용했던 .vscode/persoi18nviewer.json은 더 이상 사용되지 않음
+자동으로 package.json의 "name" 필드를 통해 포탈과 스튜디오를 감지
 
 # 프로젝트 vsix 파일로 빌드하기
 

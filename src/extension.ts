@@ -41,22 +41,6 @@ export async function activate(context: vscode.ExtensionContext) {
     config.defaultLocale
   );
 
-  // config 파일 변경 감지 및 번역 리로드
-  const configWatcher = vscode.workspace.createFileSystemWatcher(
-    new vscode.RelativePattern(
-      path.join(workspace.uri.fsPath, ".vscode"),
-      "persoi18nviewer.json"
-    )
-  );
-  const reloadConfig = () => {
-    config = loadConfig(projectName);
-    i18nManager.reload(config);
-  };
-  configWatcher.onDidChange(reloadConfig);
-  configWatcher.onDidCreate(reloadConfig);
-  configWatcher.onDidDelete(reloadConfig);
-  context.subscriptions.push(configWatcher);
-
   // 사이드바 뷰 등록
   const sidebarProvider = new I18nSidebarProvider(decorator);
   vscode.window.registerTreeDataProvider(
