@@ -4,10 +4,32 @@ import { I18nManager } from "./i18nManager";
 import { I18nDecorationProvider } from "./decorationProvider";
 import { I18nSidebarProvider } from "./sidebarProvider";
 import * as path from "path";
+import * as fs from "fs";
 
 export async function activate(context: vscode.ExtensionContext) {
   const workspace = vscode.workspace.workspaceFolders?.[0];
   if (!workspace) return; // 열린 폴더가 없으면 종료
+
+  // package.json 확인하여 "perso-mono-front" 프로젝트인지 검사
+  const packageJsonPath = path.join(workspace.uri.fsPath, "package.json");
+  if (!fs.existsSync(packageJsonPath)) {
+    return; // package.json이 없으면 extension 비활성화
+  }
+
+  try {
+    const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
+    const packageJson = JSON.parse(packageJsonContent);
+
+    if (
+      packageJson.name !== "perso-mono-front" &&
+      packageJson.name !== "perso-frontend"
+    ) {
+      return; // name이 "perso-mono-front" 또는 "perso-frontend"가 아니면 extension 비활성화
+    }
+  } catch (error) {
+    console.error("Error reading package.json:", error);
+    return; // package.json 읽기 실패 시 extension 비활성화
+  }
 
   let config = loadConfig(workspace);
   const i18nManager = new I18nManager(workspace, config, refresh);

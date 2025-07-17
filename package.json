@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "workspaceContains:.vscode/persoi18nviewer.json"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "icon": "resources/PERSO.jpg",
