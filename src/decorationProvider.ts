@@ -10,12 +10,11 @@ export class I18nDecorationProvider {
 
   private enabled = true;
   private currentLanguage: string;
-  private onSetLanguage?: (lang: string) => void;
 
   constructor(
     private readonly i18n: I18nManager,
     defaultLanguage: string,
-    onSetLanguage?: (lang: string) => void
+    private onSetLanguage?: (lang: string) => void
   ) {
     this.currentLanguage = defaultLanguage;
     this.onSetLanguage = onSetLanguage;
