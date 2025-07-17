@@ -8,7 +8,7 @@ export class I18nDecorationProvider {
       after: { color: "white", fontStyle: "italic" },
     });
 
-  private enabled = false;
+  private enabled = true;
   private currentLanguage: string;
 
   constructor(private readonly i18n: I18nManager, defaultLanguage: string) {
