@@ -11,7 +11,7 @@ export interface PersoI18nViewerConfig {
 const PORTAL_CONFIG: PersoI18nViewerConfig = {
   localesPath: "apps/portal/messages/${locale}.json",
   locales: ["en", "ko"],
-  defaultLocale: "en",
+  defaultLocale: "ko",
 };
 
 const STUDIO_CONFIG: PersoI18nViewerConfig = {

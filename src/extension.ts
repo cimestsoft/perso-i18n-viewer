@@ -3,6 +3,7 @@ import { loadConfig } from "./config";
 import { I18nManager } from "./i18nManager";
 import { I18nDecorationProvider } from "./decorationProvider";
 import { I18nSidebarProvider } from "./sidebarProvider";
+import { WORKSPACE_LOCALE_KEY } from "./const";
 
 export async function activate(context: vscode.ExtensionContext) {
   const workspace = vscode.workspace.workspaceFolders?.[0];
@@ -13,9 +14,17 @@ export async function activate(context: vscode.ExtensionContext) {
     return; // 지원하지 않는 프로젝트거나 초기화 실패 시 extension 비활성화
   }
   const i18nManager = new I18nManager(workspace, config, refresh);
+
+  const savedLocale =
+    context.workspaceState.get<string>(WORKSPACE_LOCALE_KEY) ?? "";
+  const initialLocale = i18nManager.languages().includes(savedLocale)
+    ? savedLocale
+    : config.defaultLocale;
+
   const decorator = new I18nDecorationProvider(
     i18nManager,
-    config.defaultLocale
+    initialLocale,
+    saveSelectedLanguage
   );
 
   // 사이드바 뷰 등록
@@ -51,6 +60,10 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     })
   );
+
+  function saveSelectedLanguage(lang: string) {
+    context.workspaceState.update(WORKSPACE_LOCALE_KEY, lang);
+  }
 
   function refresh() {
     decorator.refreshActive();
