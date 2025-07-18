@@ -42,6 +42,8 @@ export async function activate(context: vscode.ExtensionContext) {
     config,
     graphClientManager
   );
+  if (context.extensionMode === vscode.ExtensionMode.Development)
+    await graphClientManager.clearToken();
 
   /* 명령 등록 */
   context.subscriptions.push(
