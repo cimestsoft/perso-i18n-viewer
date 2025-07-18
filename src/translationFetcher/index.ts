@@ -9,21 +9,23 @@ export class I18nTranslationFetcher {
 
   constructor(
     private config: PersoI18nViewerConfig,
-    private context: vscode.ExtensionContext
+    context: vscode.ExtensionContext
   ) {
     this.graphClientManager = new GraphClientManager(context);
   }
 
   async fetchTranslations() {
-    const client = this.graphClientManager.createGraphClient();
-
     try {
       const { project: preset, locales } = this.config;
       const { driveId, driveItemId, sheetId, localeColumns } =
         this.config.fetchTranslationInfo;
       const endPoint = `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${driveItemId}/workbook/worksheets/${sheetId}/usedRange`;
 
-      const values: string[][] = (await client.api(endPoint).get()).values;
+      const values: string[][] = (
+        await this.graphClientManager.executeApiCall((client) =>
+          client.api(endPoint).get()
+        )
+      ).values;
 
       const headers = values.shift() as string[];
       const idxs = ["category", "key", ...localeColumns].map((name) =>
@@ -74,16 +76,9 @@ export class I18nTranslationFetcher {
         "다국어 파일이 성공적으로 업데이트되었습니다."
       );
     } catch (error: any) {
-      if (error.code === "InvalidAuthenticationToken") {
-        vscode.window.showErrorMessage(
-          "인증 토큰이 만료되었습니다. 다시 인증해주세요."
-        );
-        await this.graphClientManager.clearToken();
-      } else {
-        vscode.window.showErrorMessage(
-          `다국어 파일 업데이트 중 오류가 발생했습니다: ${error.message}`
-        );
-      }
+      vscode.window.showErrorMessage(
+        `다국어 파일 업데이트 중 오류가 발생했습니다: ${error.message}`
+      );
     }
   }
 }

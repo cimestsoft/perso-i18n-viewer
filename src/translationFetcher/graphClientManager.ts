@@ -8,6 +8,8 @@ import {
 } from "./const";
 
 export class GraphClientManager {
+  private static clientInstance: Client | null = null;
+
   constructor(private context: vscode.ExtensionContext) {}
 
   /**
@@ -102,16 +104,19 @@ export class GraphClientManager {
   }
 
   /**
-   * Microsoft Graph Client를 생성합니다.
-   * 각 요청마다 토큰 유효성을 자동으로 체크합니다.
+   * Microsoft Graph Client를 생성하거나 기존 인스턴스를 반환합니다.
+   * 싱글톤 패턴으로 관리되어 항상 같은 인스턴스를 재사용합니다.
    * @returns 인증된 Microsoft Graph Client
    */
-  createGraphClient(): Client {
-    return Client.initWithMiddleware({
-      authProvider: {
-        getAccessToken: () => this.getAccessToken(),
-      },
-    });
+  getGraphClient(): Client {
+    if (!GraphClientManager.clientInstance) {
+      GraphClientManager.clientInstance = Client.initWithMiddleware({
+        authProvider: {
+          getAccessToken: () => this.getAccessToken(),
+        },
+      });
+    }
+    return GraphClientManager.clientInstance;
   }
 
   /**
@@ -126,5 +131,40 @@ export class GraphClientManager {
       FETCH_TRANSLATION_TOKEN_EXPIRES_AT_KEY,
       undefined
     );
+  }
+
+  /**
+   * 클라이언트 인스턴스를 초기화합니다.
+   * 주로 테스트나 완전한 재시작이 필요할 때 사용합니다.
+   */
+  static resetClientInstance(): void {
+    GraphClientManager.clientInstance = null;
+  }
+
+  /**
+   * Microsoft Graph API 호출을 래핑하여 토큰 만료 에러를 자동으로 처리합니다.
+   * @param apiCall API 호출 함수
+   * @returns API 응답 결과
+   */
+  async executeApiCall<T>(apiCall: (client: Client) => Promise<T>): Promise<T> {
+    const client = this.getGraphClient();
+
+    try {
+      return await apiCall(client);
+    } catch (error: any) {
+      // 토큰 만료 에러인 경우 토큰을 클리어하고 재시도
+      if (error.code === "InvalidAuthenticationToken") {
+        await this.clearToken();
+        // 클라이언트 인스턴스도 재생성
+        GraphClientManager.resetClientInstance();
+
+        // 새로운 클라이언트로 재시도
+        const newClient = this.getGraphClient();
+        return await apiCall(newClient);
+      }
+
+      // 다른 에러는 그대로 재던짐
+      throw error;
+    }
   }
 }
