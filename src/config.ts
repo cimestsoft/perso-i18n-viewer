@@ -1,6 +1,4 @@
 import * as vscode from "vscode";
-import * as path from "path";
-import * as fs from "fs";
 
 export interface PersoI18nViewerConfig {
   project: "portal" | "studio"; // "portal" 또는 "studio"
@@ -43,9 +41,9 @@ const STUDIO_CONFIG: PersoI18nViewerConfig = {
   },
 };
 
-export function loadConfig(
+export async function loadConfig(
   workspace?: vscode.WorkspaceFolder
-): PersoI18nViewerConfig | null {
+): Promise<PersoI18nViewerConfig | null> {
   // workspace가 없으면 현재 작업영역에서 가져오기
   if (!workspace) {
     workspace = vscode.workspace.workspaceFolders?.[0];
@@ -53,16 +51,22 @@ export function loadConfig(
   }
 
   // package.json 확인하여 프로젝트 타입 검사
-  const packageJsonPath = path.join(workspace.uri.fsPath, "package.json");
-  if (!fs.existsSync(packageJsonPath)) {
+  const packageJsonUri = vscode.Uri.joinPath(workspace.uri, "package.json");
+
+  try {
+    await vscode.workspace.fs.stat(packageJsonUri);
+  } catch (error) {
     return null; // package.json이 없으면 null 반환
   }
 
   let projectName: "portal" | "studio";
 
   try {
-    const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
-    const packageJson = JSON.parse(packageJsonContent);
+    const packageJsonContent = await vscode.workspace.fs.readFile(
+      packageJsonUri
+    );
+    const packageJsonText = new TextDecoder().decode(packageJsonContent);
+    const packageJson = JSON.parse(packageJsonText);
 
     if (packageJson.name === "perso-mono-front") {
       projectName = "portal";

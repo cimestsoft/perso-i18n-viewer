@@ -11,11 +11,12 @@ export async function activate(context: vscode.ExtensionContext) {
   const workspace = vscode.workspace.workspaceFolders?.[0];
 
   // 프로젝트 초기화 및 설정 로드
-  let config = loadConfig(workspace);
+  let config = await loadConfig(workspace);
   if (!config || !workspace) {
     return; // 지원하지 않는 프로젝트거나 초기화 실패 시 extension 비활성화
   }
   const i18nManager = new I18nManager(workspace, config, refresh);
+  await i18nManager.initialize();
 
   const savedLocale =
     context.workspaceState.get<string>(WORKSPACE_LOCALE_KEY) ?? "";
@@ -60,11 +61,11 @@ export async function activate(context: vscode.ExtensionContext) {
         if (pick) decorator.setLanguage(pick);
       }
     ),
-    vscode.commands.registerCommand("persoi18nviewer.reload", () => {
-      const newConfig = loadConfig(workspace); // config 재로드 (폴더 경로 변경 가능)
+    vscode.commands.registerCommand("persoi18nviewer.reload", async () => {
+      const newConfig = await loadConfig(workspace); // config 재로드 (폴더 경로 변경 가능)
       if (newConfig) {
         config = newConfig;
-        i18nManager.reload(config);
+        await i18nManager.reload(config);
       }
     }),
     vscode.commands.registerCommand("persoi18nviewer.fetchTranslations", () =>

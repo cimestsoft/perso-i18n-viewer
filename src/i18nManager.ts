@@ -1,6 +1,4 @@
 import * as vscode from "vscode";
-import * as fs from "fs";
-import * as path from "path";
 import { PersoI18nViewerConfig } from "./config";
 
 export class I18nManager {
@@ -12,8 +10,12 @@ export class I18nManager {
     private config: PersoI18nViewerConfig,
     private readonly onReload: () => void
   ) {
-    this.loadAll();
+    // constructor에서는 동기 작업만 수행
     this.createWatcher();
+  }
+
+  async initialize() {
+    await this.loadAll();
   }
 
   dispose() {
@@ -29,47 +31,49 @@ export class I18nManager {
     return [...this.translations.keys()];
   }
 
-  public reload(config?: PersoI18nViewerConfig) {
+  public async reload(config?: PersoI18nViewerConfig) {
     if (config) this.config = config;
     this.translations.clear();
-    this.loadAll();
+    await this.loadAll();
     this.onReload();
   }
 
   // --- private -----------------------------------------------------------
 
-  private loadAll() {
-    this.config.locales.forEach((locale) => {
-      const filePath = this.config.localesPath.replace("${locale}", locale);
+  private async loadAll() {
+    await Promise.all(
+      this.config.locales.map(async (locale) => {
+        const filePath = this.config.localesPath.replace("${locale}", locale);
 
-      const absFilePath = path.isAbsolute(filePath)
-        ? filePath
-        : path.join(this.workspace.uri.fsPath, filePath);
+        // config.localesPath는 항상 상대 경로이므로 workspace.uri와 결합
+        const fileUri = vscode.Uri.joinPath(this.workspace.uri, filePath);
 
-      if (!fs.existsSync(absFilePath)) {
-        console.warn(`Locale file not found: ${absFilePath}`);
-        return;
-      }
+        try {
+          await vscode.workspace.fs.stat(fileUri);
+        } catch (error) {
+          console.warn(`Locale file not found: ${fileUri.fsPath}`);
+          return;
+        }
 
-      try {
-        const raw = fs.readFileSync(absFilePath, "utf-8");
-        this.translations.set(locale, JSON.parse(raw));
-      } catch (error) {
-        // Ignore malformed JSON files
-        console.error(`Error reading locale file ${absFilePath}:`, error);
-      }
-    });
+        try {
+          const fileContent = await vscode.workspace.fs.readFile(fileUri);
+          const fileText = new TextDecoder().decode(fileContent);
+          this.translations.set(locale, JSON.parse(fileText));
+        } catch (error) {
+          // Ignore malformed JSON files
+          console.error(`Error reading locale file ${fileUri.fsPath}:`, error);
+        }
+      })
+    );
   }
 
   private createWatcher() {
     // localesPath에서 디렉터리 경로 추출 (${locale} 부분을 제거)
     const templatePath = this.config.localesPath.replace("${locale}", "*");
-    const workspacePath = this.workspace.uri.fsPath;
 
     // 디렉터리 경로와 파일명 패턴 분리
-
     this.watcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(workspacePath, templatePath)
+      new vscode.RelativePattern(this.workspace, templatePath)
     );
 
     const reload = () => this.reload();
