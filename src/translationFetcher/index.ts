@@ -5,14 +5,10 @@ import * as fs from "fs";
 import * as path from "path";
 
 export class I18nTranslationFetcher {
-  private graphClientManager: GraphClientManager;
-
   constructor(
     private config: PersoI18nViewerConfig,
-    context: vscode.ExtensionContext
-  ) {
-    this.graphClientManager = new GraphClientManager(context);
-  }
+    private graphClientManager: GraphClientManager
+  ) {}
 
   async fetchTranslations() {
     try {

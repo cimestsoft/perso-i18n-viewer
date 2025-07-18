@@ -5,6 +5,7 @@ import { I18nDecorationProvider } from "./decorationProvider";
 import { I18nSidebarProvider } from "./sidebarProvider";
 import { WORKSPACE_LOCALE_KEY } from "./const";
 import { I18nTranslationFetcher } from "./translationFetcher";
+import { GraphClientManager } from "./translationFetcher/graphClientManager";
 
 export async function activate(context: vscode.ExtensionContext) {
   const workspace = vscode.workspace.workspaceFolders?.[0];
@@ -35,7 +36,11 @@ export async function activate(context: vscode.ExtensionContext) {
     sidebarProvider
   );
 
-  const translationFetcher = new I18nTranslationFetcher(config, context);
+  const graphClientManager = new GraphClientManager(context);
+  const translationFetcher = new I18nTranslationFetcher(
+    config,
+    graphClientManager
+  );
 
   /* 명령 등록 */
   context.subscriptions.push(

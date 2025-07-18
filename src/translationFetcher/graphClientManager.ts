@@ -33,6 +33,23 @@ export class GraphClientManager {
    * 디바이스 코드 플로우를 통해 새로운 토큰을 획득합니다.
    */
   private async acquireNewToken(): Promise<string | null> {
+    // 사용자에게 인증 과정에 대한 설명과 동의를 구함
+    const userConsent = await vscode.window.showInformationMessage(
+      "다국어 파일에 접근하기 위해 Microsoft 계정 인증이 필요합니다.\n\n" +
+        "진행하면:\n" +
+        "• 인증 코드가 클립보드에 자동으로 복사됩니다\n" +
+        "• 브라우저에서 인증 페이지가 열립니다\n" +
+        "• 복사된 코드를 붙여넣어 인증을 완료해주세요\n\n" +
+        "인증을 진행하시겠습니까?",
+      "예",
+      "아니오"
+    );
+
+    if (userConsent !== "예") {
+      vscode.window.showInformationMessage("인증이 취소되었습니다.");
+      return null;
+    }
+
     const pca = new PublicClientApplication(PcaConfig);
 
     try {
@@ -59,11 +76,17 @@ export class GraphClientManager {
       );
 
       if (result.expiresOn) {
+        console.log("expiresOn", result.expiresOn);
         await this.context.globalState.update(
           FETCH_TRANSLATION_TOKEN_EXPIRES_AT_KEY,
           result.expiresOn.getTime()
         );
       }
+
+      // 인증 성공 알림
+      vscode.window.showInformationMessage(
+        "Microsoft 계정 인증이 성공적으로 완료되었습니다!"
+      );
 
       return result.accessToken;
     } catch (error: any) {
