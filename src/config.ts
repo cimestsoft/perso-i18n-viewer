@@ -3,21 +3,44 @@ import * as path from "path";
 import * as fs from "fs";
 
 export interface PersoI18nViewerConfig {
+  project: "portal" | "studio"; // "portal" 또는 "studio"
   localesPath: string; // 상대 또는 절대 경로
-  locales: string[]; // ["en", "ko", ...] (선택적)
+  locales: string[]; // ["en", "ko", ...]
   defaultLocale: string; // "en" 등
+  fetchTranslationInfo: {
+    localeColumns: string[]; // ["Korean", "English"]
+    driveItemId: string;
+    driveId: string;
+    sheetId: string;
+  };
 }
 
 const PORTAL_CONFIG: PersoI18nViewerConfig = {
+  project: "portal",
   localesPath: "apps/portal/messages/${locale}.json",
   locales: ["en", "ko"],
   defaultLocale: "ko",
+  fetchTranslationInfo: {
+    localeColumns: ["English", "Korean"],
+    driveItemId: "015XQXWIDOQCWXLRJ46VGYPZWCZBVKQHLO",
+    driveId:
+      "b!MKvRnGvW7kyKOrRDaeGPWKtI7x9Kr2RLlbREChYRQlgGMIAZKtb6RII9kQhIzC7p",
+    sheetId: "{F128438D-B66E-BF4F-8F37-800C8F44FE9F}",
+  },
 };
 
 const STUDIO_CONFIG: PersoI18nViewerConfig = {
+  project: "studio",
   localesPath: "src/locales/${locale}/translation.json",
   locales: ["en", "ko"],
   defaultLocale: "ko",
+  fetchTranslationInfo: {
+    localeColumns: ["en", "ko"],
+    driveItemId: "01AVD2GEBO4VKZH4T4VJGYKLXMVV3YBETS",
+    driveId:
+      "b!L6lr13fgLUCVX5SiqAHK2AlK6VhofXJItkLK9qZ_iUcgXVHDtAcEQJgT0xO11QEF",
+    sheetId: "{CD368812-E153-FB4C-842F-769D901518E4}",
+  },
 };
 
 export function loadConfig(

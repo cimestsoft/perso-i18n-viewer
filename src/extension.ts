@@ -62,9 +62,8 @@ export async function activate(context: vscode.ExtensionContext) {
         i18nManager.reload(config);
       }
     }),
-    vscode.commands.registerCommand(
-      "persoi18nviewer.fetchTranslations",
-      translationFetcher.fetchTranslations
+    vscode.commands.registerCommand("persoi18nviewer.fetchTranslations", () =>
+      translationFetcher.fetchTranslations()
     )
   );
 
