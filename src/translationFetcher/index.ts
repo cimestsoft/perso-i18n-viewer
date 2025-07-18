@@ -72,6 +72,10 @@ export class I18nTranslationFetcher {
         "다국어 파일이 성공적으로 업데이트되었습니다."
       );
     } catch (error: any) {
+      if (error.message === "사용자가 인증을 취소했습니다.") {
+        vscode.window.showInformationMessage("인증이 취소되었습니다.");
+        return;
+      }
       vscode.window.showErrorMessage(
         `다국어 파일 업데이트 중 오류가 발생했습니다: ${error.message}`
       );
