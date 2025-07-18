@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
 import { PersoI18nViewerConfig } from "../config";
 import { GraphClientManager } from "./graphClientManager";
-import * as fs from "fs";
-import * as path from "path";
 
 export class I18nTranslationFetcher {
   constructor(
@@ -50,24 +48,30 @@ export class I18nTranslationFetcher {
         });
       });
 
-      locales.forEach((lang) => {
-        // fs를 사용해서 파일 덮어쓰기
+      for (const lang of locales) {
+        // vscode.workspace.fs를 사용해서 파일 덮어쓰기
         const filePath = this.config.localesPath.replace("${locale}", lang);
-        const absFilePath = path.isAbsolute(filePath)
-          ? filePath
-          : path.join(
-              vscode.workspace.workspaceFolders![0].uri.fsPath,
-              filePath
-            );
-        fs.mkdirSync(path.dirname(absFilePath), { recursive: true });
-        fs.writeFileSync(
-          absFilePath,
+
+        // 워크스페이스 확인
+        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+        if (!workspaceFolder) {
+          throw new Error("워크스페이스가 열려있지 않습니다.");
+        }
+
+        // 상대 경로를 워크스페이스 기준으로 변환
+        const fileUri = vscode.Uri.joinPath(workspaceFolder.uri, filePath);
+
+        // 파일 내용 작성
+        const content =
           JSON.stringify(json[lang], null, 2) +
-            // 스튜디오 프로젝트는 끝에 줄바꿈 추가
-            (preset === "studio" ? "\n" : ""),
-          "utf-8"
+          // 스튜디오 프로젝트는 끝에 줄바꿈 추가
+          (preset === "studio" ? "\n" : "");
+
+        await vscode.workspace.fs.writeFile(
+          fileUri,
+          Buffer.from(content, "utf-8")
         );
-      });
+      }
       vscode.window.showInformationMessage(
         "다국어 파일이 성공적으로 업데이트되었습니다."
       );

@@ -4,7 +4,7 @@ import * as fs from "fs";
 
 export interface PersoI18nViewerConfig {
   project: "portal" | "studio"; // "portal" 또는 "studio"
-  localesPath: string; // 상대 또는 절대 경로
+  localesPath: string; // 상대 경로
   locales: string[]; // ["en", "ko", ...]
   defaultLocale: string; // "en" 등
   fetchTranslationInfo: {
